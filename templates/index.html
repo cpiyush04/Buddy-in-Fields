@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FarmerASS - Agricultural AI</title>
+    <link rel="icon" type="image/png" href="https://img.icons8.com/color/48/tractor.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            /* Professional Farm Background */
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4)), url('https://images.unsplash.com/photo-1625246333195-098e475c5393?q=80&w=1974&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            font-family: 'Segoe UI', sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .main-wrapper {
+            display: flex;
+            width: 95%;
+            max-width: 1400px;
+            height: 92vh;
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* --- SIDEBAR (History) --- */
+        .sidebar {
+            width: 280px;
+            background: rgba(241, 248, 233, 0.9);
+            border-right: 1px solid #c5e1a5;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .new-chat-btn {
+            background: #2e7d32;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            width: 100%;
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 20px;
+            transition: 0.3s;
+            box-shadow: 0 4px 6px rgba(46, 125, 50, 0.2);
+        }
+        .new-chat-btn:hover { background: #1b5e20; transform: translateY(-1px); }
+
+        .session-label {
+            font-size: 0.85rem;
+            color: #558b2f;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding-left: 5px;
+        }
+
+        .session-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        
+        .session-item {
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #37474f;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 0.95rem;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        .session-item:hover { background: #dcedc8; border-color: #c5e1a5; }
+        .session-item.active { 
+            background: #a5d6a7; 
+            color: #1b5e20; 
+            font-weight: 600; 
+            border-color: #81c784;
+        }
+        .session-item i { margin-right: 8px; color: #558b2f; }
+
+        /* --- CHAT AREA --- */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            position: relative;
+        }
+
+        .chat-header {
+            padding: 15px 25px;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        
+        .chat-header h5 {
+            font-weight: 700;
+            color: #2e7d32;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+            background: #fafafa;
+            scroll-behavior: smooth;
+        }
+
+        /* Messages */
+        .message {
+            max-width: 80%;
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            border-radius: 18px;
+            line-height: 1.6;
+            font-size: 1rem;
+            position: relative;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .user-message {
+            background: #e8f5e9;
+            color: #1b5e20;
+            align-self: flex-end;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+            border: 1px solid #c8e6c9;
+        }
+        .assistant-message {
+            background: white;
+            border: 1px solid #e0e0e0;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .agent-tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #7cb342;
+            font-weight: 700;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* --- FOOTER / INPUT --- */
+        .chat-footer {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+
+        #chat-form {
+            background: #f1f8e9;
+            padding: 8px;
+            border-radius: 30px;
+            border: 1px solid #c5e1a5;
+            transition: border-color 0.3s;
+        }
+        #chat-form:focus-within {
+            border-color: #7cb342;
+            box-shadow: 0 0 0 3px rgba(124, 179, 66, 0.2);
+        }
+
+        .message-input {
+            border: none;
+            background: transparent;
+            padding: 10px 15px;
+            resize: none;
+            font-size: 1rem;
+        }
+        .message-input:focus {
+            box-shadow: none;
+            background: transparent;
+        }
+
+        .action-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            margin: 0 2px;
+        }
+        .btn-send { background: #2e7d32; color: white; }
+        .btn-send:hover { background: #1b5e20; transform: scale(1.05); }
+        .btn-upload { background: #fff; color: #558b2f; border: 1px solid #c5e1a5; }
+        .btn-upload:hover { background: #dcedc8; }
+        .btn-voice { background: #fff; color: #ef6c00; border: 1px solid #ffcc80; }
+        .btn-voice.recording { background: #ef6c00; color: white; animation: pulse-red 1.5s infinite; }
+
+        /* Images & Previews */
+        .preview-container {
+            position: absolute;
+            bottom: 85px;
+            left: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: none;
+            border: 1px solid #e0e0e0;
+        }
+        .preview-image { height: 80px; border-radius: 6px; }
+        .result-image { max-width: 100%; border-radius: 10px; margin-top: 10px; border: 3px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+
+        /* Loading Animation */
+        .dot {
+            height: 8px;
+            width: 8px;
+            margin-right: 4px;
+            background-color: #558b2f;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 1.4s infinite ease-in-out;
+        }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes pulse { 0%, 100% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1.2); opacity: 1; } }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 108, 0, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 108, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 108, 0, 0); } }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #c5e1a5; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9ccc65; }
+
+        /* Table Styles for Markdown */
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.9em; }
+        th { background: #f1f8e9; color: #33691e; padding: 10px; border: 1px solid #dcedc8; }
+        td { padding: 8px; border: 1px solid #e0e0e0; }
+    </style>
+</head>
+<body>
+
+<div class="main-wrapper">
+    <div class="sidebar">
+        <button class="new-chat-btn" onclick="startNewChat()">
+            <i class="fas fa-plus me-2"></i> New Chat
+        </button>
+        
+        <div class="session-label">Your Conversations</div>
+        <div class="session-list" id="session-list">
+            <div class="text-center text-muted mt-3 small">
+                <i class="fas fa-spinner fa-spin"></i> Loading history...
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-area">
+        <div class="chat-header">
+            <h5>
+                <i class="fas fa-tractor me-2 text-success"></i> 
+                FarmerASS 
+                <span class="badge bg-light text-dark ms-2 fw-normal border" style="font-size: 0.7em;">Kisan Sahayak</span>
+            </h5>
+            <div>
+                <button class="btn btn-sm btn-outline-danger border-0" id="clear-chat" title="Clear current view">
+                    <i class="fas fa-eraser"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div id="chat-body" class="chat-body">
+            <div class="message assistant-message">
+                <div class="agent-tag">System</div>
+                <p><strong>Namaste! 🙏</strong> I am your AI farming assistant. <br>
+                I can help you with crop diseases, pests, market prices, and general farming advice.</p>
+                <p class="mb-0 text-muted small"><i class="fas fa-arrow-left me-1"></i> Start a new chat or select history from the sidebar.</p>
+            </div>
+        </div>
+
+        <div class="chat-footer">
+            <div class="preview-container" id="preview-container">
+                <div class="d-flex align-items-center">
+                    <img id="preview-image" class="preview-image me-3" src="">
+                    <div>
+                        <div class="fw-bold small text-success">Image Attached</div>
+                        <button type="button" class="btn btn-sm btn-link text-danger p-0 text-decoration-none" id="remove-image">Remove</button>
+                    </div>
+                </div>
+            </div>
+
+            <form id="chat-form" class="d-flex align-items-center">
+                <input type="file" id="image-upload" hidden accept="image/*">
+                
+                <button type="button" class="action-btn btn-upload" onclick="document.getElementById('image-upload').click()" title="Upload Photo">
+                    <i class="fas fa-camera"></i>
+                </button>
+                
+                <button type="button" class="action-btn btn-voice" id="voice-record-btn" title="Voice Input">
+                    <i class="fas fa-microphone"></i>
+                </button>
+
+                <textarea id="message-input" class="form-control message-input mx-2" rows="1" placeholder="Ask about your crops..."></textarea>
+                
+                <button type="submit" class="action-btn btn-send" title="Send">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.2/marked.min.js"></script>
+<script>
+    let mediaRecorder;
+    let audioChunks = [];
+    let isRecording = false;
+    let currentAudio = null;
+    let currentSessionId = null; // Tracks active chat
+    const selectedVoiceId = '21m00Tcm4TlvDq8ikWAM'; 
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load sessions immediately on start
+        loadSessions();
+        // Clear old session visually so hitting F5 creates a new context
+        startFreshOnReload();
+
+        const messageInput = document.getElementById('message-input');
+        const imageUpload = document.getElementById('image-upload');
+        const previewContainer = document.getElementById('preview-container');
+        const previewImage = document.getElementById('preview-image');
+        
+        // Auto-resize textarea
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+            if(this.value === '') this.style.height = 'auto';
+        });
+
+        // Enter to send
+        messageInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                document.getElementById('chat-form').dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // Image Preview Logic
+        imageUpload.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewContainer.style.display = 'block';
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+
+        document.getElementById('remove-image').addEventListener('click', function() {
+            imageUpload.value = '';
+            previewContainer.style.display = 'none';
+        });
+
+        document.getElementById('clear-chat').addEventListener('click', function() {
+            document.getElementById('chat-body').innerHTML = '';
+        });
+
+        // Voice Recording Button
+        document.getElementById('voice-record-btn').addEventListener('click', toggleRecording);
+
+        // --- SINGLE, CORRECT CHAT SUBMISSION HANDLER ---
+        document.getElementById('chat-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const text = messageInput.value.trim();
+            const hasFile = imageUpload.files.length > 0;
+
+            if (!text && !hasFile) return;
+
+            // 1. Visuals: Add User Message immediately
+            let userContent = text;
+            if (hasFile) {
+                // Show local preview immediately for better UX
+                userContent += `<div class="mt-2"><img src="${previewImage.src}" class="img-fluid rounded" style="max-height:200px"></div>`;
+            }
+            appendMessage('user', userContent);
+
+            // 2. Prepare Data
+            let formData;
+            let endpoint;
+            
+            if (hasFile) {
+                formData = new FormData();
+                formData.append('text', text);
+                formData.append('image', imageUpload.files[0]);
+                // If we have a session, send it. If null, backend creates new one.
+                if (currentSessionId) formData.append('session_id', currentSessionId);
+                endpoint = '/upload';
+            } else {
+                endpoint = '/chat';
+            }
+
+            // 3. Clear Inputs
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            imageUpload.value = '';
+            previewContainer.style.display = 'none';
+
+            // 4. Loading State
+            const loadingId = showThinking();
+
+            // 5. Send to Backend
+            try {
+                let response;
+                if (hasFile) {
+                    response = await fetch(endpoint, {
+                        method: 'POST',
+                        body: formData
+                    });
+                } else {
+                    response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            query: text, 
+                            session_id: currentSessionId 
+                        })
+                    });
+                }
+
+                const data = await response.json();
+                removeThinking(loadingId);
+
+                // 6. Handle Response & Session Update
+                if (data.session_id) {
+                    // If session ID changed (e.g., from null to new ID), update state
+                    if (currentSessionId !== data.session_id) {
+                        currentSessionId = data.session_id;
+                        loadSessions(); // Refresh sidebar to show new chat title
+                    } else {
+                        // Refresh anyway to update title if it changed
+                        loadSessions();
+                    }
+                }
+
+                if (data.response) {
+                    renderAssistantMessage(data);
+                } else {
+                    appendMessage('assistant', "I processed the request but received no text response.");
+                }
+
+            } catch (error) {
+                removeThinking(loadingId);
+                appendMessage('assistant', `**Error:** ${error.message}`);
+                console.error(error);
+            }
+        });
+    });
+
+    // --- SESSION MANAGEMENT ---
+    function startFreshOnReload() {
+        // Clear visual chat
+        document.getElementById('chat-body').innerHTML = `
+            <div class="message assistant-message">
+                <div class="agent-tag">System</div>
+                <p><strong>Namaste! 🙏</strong> I am your AI farming assistant.<br>
+                Start a new conversation below, or select a previous chat from the history.</p>
+            </div>
+        `;
+        // Reset ID so next message creates a new entry
+        currentSessionId = null; 
+        // Clear backend cookie
+        document.cookie = "session_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    }
+
+    async function loadSessions() {
+        try {
+            const res = await fetch('/sessions');
+            const data = await res.json();
+            const list = document.getElementById('session-list');
+            list.innerHTML = '';
+            
+            if (data.sessions.length === 0) {
+                list.innerHTML = '<div class="text-muted small text-center mt-3">No history found</div>';
+                return;
+            }
+
+            data.sessions.forEach(s => {
+                const div = document.createElement('div');
+                div.className = `session-item ${s.id === currentSessionId ? 'active' : ''}`;
+                div.innerHTML = `<i class="fas fa-comment-dots"></i> ${s.title || 'New Chat'}`;
+                div.onclick = () => loadChatHistory(s.id);
+                list.appendChild(div);
+            });
+        } catch (e) {
+            console.error("Failed to load sessions");
+        }
+    }
+
+    async function startNewChat() {
+        const res = await fetch('/new-chat', { method: 'POST' });
+        const data = await res.json();
+        currentSessionId = data.session_id;
+        document.getElementById('chat-body').innerHTML = `
+            <div class="message assistant-message">
+                <div class="agent-tag">System</div>
+                <p>New session started. How can I help with your farm today?</p>
+            </div>
+        `;
+        loadSessions();
+    }
+
+    async function loadChatHistory(id) {
+        currentSessionId = id;
+        const res = await fetch(`/sessions/${id}`);
+        const data = await res.json();
+        
+        const body = document.getElementById('chat-body');
+        body.innerHTML = ''; // Clear view
+        
+        if (data.history && data.history.length > 0) {
+            data.history.forEach(msg => {
+                appendMessage(msg.role, msg.content);
+            });
+        } else {
+            body.innerHTML = '<div class="text-center text-muted mt-5">Empty conversation</div>';
+        }
+        
+        loadSessions(); // Re-render sidebar to highlight active
+    }
+
+    // --- RENDER HELPERS ---
+    function appendMessage(role, content) {
+        if (!content) return; 
+        
+        const div = document.createElement('div');
+        div.className = `message ${role === 'user' ? 'user-message' : 'assistant-message'}`;
+        
+        // If content already contains HTML (like the image preview), don't markdown parse it
+        if (content.includes('<img')) {
+             div.innerHTML = content;
+        } else {
+             // Parse markdown safely
+             const htmlContent = typeof marked !== 'undefined' && marked.parse ? marked.parse(content) : content;
+             if (role === 'assistant') {
+                div.innerHTML = `<div class="agent-tag">FarmerASS</div> ${htmlContent}`;
+             } else {
+                div.innerHTML = htmlContent;
+             }
+        }
+        
+        document.getElementById('chat-body').appendChild(div);
+        document.getElementById('chat-body').scrollTop = document.getElementById('chat-body').scrollHeight;
+    }
+
+    function renderAssistantMessage(data) {
+        const div = document.createElement('div');
+        div.className = 'message assistant-message';
+        
+        const cleanText = removeMarkdown(data.response);
+        
+        let html = `
+            <div class="agent-tag">${data.agent}</div>
+            <div>${marked.parse(data.response)}</div>
+        `;
+
+        // Backend result image (e.g. segmentation map)
+        if (data.result_image) {
+             html += `<img src="${data.result_image}" class="result-image">`;
+        }
+
+        // TTS Button
+        html += `
+            <div class="mt-2">
+                <button class="btn btn-sm btn-outline-success play-tts-btn rounded-pill px-3">
+                    <i class="fas fa-volume-up me-1"></i> Listen
+                </button>
+            </div>
+        `;
+
+        // Validation UI
+        if (data.agent && data.agent.includes('HUMAN_VALIDATION')) {
+            html += `
+                <div class="mt-3 p-3 bg-light rounded border border-warning">
+                    <small class="fw-bold text-warning"><i class="fas fa-user-check"></i> Verification Needed</small>
+                    <div class="mt-2 d-flex gap-2">
+                        <button class="btn btn-sm btn-success validate-btn" data-val="yes">Correct</button>
+                        <button class="btn btn-sm btn-danger validate-btn" data-val="no">Incorrect</button>
+                    </div>
+                    <input type="text" class="form-control mt-2 form-control-sm validation-comments" placeholder="Optional comments...">
+                </div>
+            `;
+        }
+
+        div.innerHTML = html;
+        document.getElementById('chat-body').appendChild(div);
+        document.getElementById('chat-body').scrollTop = document.getElementById('chat-body').scrollHeight;
+
+        // Bind Listeners
+        div.querySelector('.play-tts-btn').onclick = (e) => playTTS(cleanText, e.target.closest('button'));
+        
+        // Bind Validation
+        div.querySelectorAll('.validate-btn').forEach(btn => {
+            btn.onclick = async () => {
+                // 1. Visual Feedback immediately
+                const parentDiv = btn.closest('.p-3'); // Find the container
+                const comments = parentDiv.querySelector('.validation-comments').value;
+                
+                // Replace buttons with "Feedback Sent" status
+                parentDiv.innerHTML = `<span class="text-success fw-bold"><i class="fas fa-check-circle"></i> Validation Recorded</span>`;
+                
+                // 2. Send to backend and wait for the AI response (handled by sendValidation)
+                await sendValidation(btn.getAttribute('data-val'), comments);
+            };
+        });
+    }
+
+    function showThinking() {
+        const id = 'loading-' + Date.now();
+        const div = document.createElement('div');
+        div.id = id;
+        div.className = 'message assistant-message';
+        div.innerHTML = `<div class="dot"></div><div class="dot"></div><div class="dot"></div>`;
+        document.getElementById('chat-body').appendChild(div);
+        document.getElementById('chat-body').scrollTop = document.getElementById('chat-body').scrollHeight;
+        return id;
+    }
+
+    function removeThinking(id) {
+        const el = document.getElementById(id);
+        if (el) el.remove();
+    }
+
+    // --- AUDIO UTILS ---
+    function toggleRecording() {
+        const btn = document.getElementById('voice-record-btn');
+        if (!isRecording) {
+            navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                mediaRecorder.onstop = () => transcribe(new Blob(audioChunks));
+                mediaRecorder.start();
+                isRecording = true;
+                btn.classList.add('recording');
+            });
+        } else {
+            mediaRecorder.stop();
+            isRecording = false;
+            btn.classList.remove('recording');
+        }
+    }
+
+    async function transcribe(blob) {
+        const fd = new FormData();
+        fd.append('audio', blob);
+        document.getElementById('message-input').placeholder = "Transcribing...";
+        
+        try {
+            const res = await fetch('/transcribe', { method: 'POST', body: fd });
+            const data = await res.json();
+            if (data.transcript) {
+                document.getElementById('message-input').value = data.transcript;
+            }
+        } catch(e) {
+            console.error(e);
+        } finally {
+            document.getElementById('message-input').placeholder = "Ask about your crops...";
+        }
+    }
+
+    async function playTTS(text, btn) {
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        try {
+            const res = await fetch('/generate-speech', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ text: text.substring(0, 500), voice_id: selectedVoiceId })
+            });
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            if(currentAudio) currentAudio.pause();
+            currentAudio = new Audio(url);
+            currentAudio.play();
+            btn.innerHTML = '<i class="fas fa-stop"></i> Stop';
+            currentAudio.onended = () => btn.innerHTML = '<i class="fas fa-volume-up"></i> Listen';
+        } catch (e) {
+            btn.innerHTML = 'Error';
+        }
+    }
+
+    async function sendValidation(val, comment) {
+        const fd = new FormData();
+        fd.append('validation_result', val);
+        fd.append('comments', comment);
+        
+        try {
+            const response = await fetch('/validate', { method: 'POST', body: fd });
+            const data = await response.json();
+            
+            // --- FIX: Display the AI's follow-up response ---
+            if (data.response) {
+                // Wait a moment so it feels natural, then show the message
+                setTimeout(() => {
+                    renderAssistantMessage(data); 
+                }, 500);
+            }
+        } catch (e) {
+            console.error("Validation error:", e);
+        }
+    }
+
+    function removeMarkdown(text) {
+        if (!text) return '';
+        return text.replace(/[*#`\[\]]/g, '');
+    }
+</script>
+</body>
+</html>
