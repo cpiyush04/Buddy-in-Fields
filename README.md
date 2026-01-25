@@ -40,6 +40,7 @@ Before running the application, ensure you have the following installed:
     * `GOOGLE_GENAI_API_KEY` (For the LLM)
     * `ELEVEN_LABS_API_KEY` (For Voice output)
     * `TAVILY_API_KEY` (For web search capabilities)
+3. **Python version**: Use Python 3.11 as interpreter as some packages are not supported by Python 3.13 or later
 
 ---
 
