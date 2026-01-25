@@ -49,8 +49,7 @@ This project is optimized for Docker to ensure reproducibility across different 
 
 ### 1. Clone the Repository
 ```bash
-git clone [https://github.com/yourusername/buddy-in-fields.git](https://github.com/yourusername/buddy-in-fields.git)
-cd buddy-in-fields
+git clone https://github.com/cpiyush04/Buddy-in-Fields
 ```
 
 ### 2. Configure Environment Variables
@@ -141,11 +140,14 @@ Install System Dependencies:
 
 - You need C++ build tools for some Python libraries.
 
-Install Python Packages:
+Install Python Packages
 
+For installing pinned version use the below:
 ```bash
-pip install -r requirements.txt
+pip install -r requirements.lock
 ```
+You may also use requirements.txt
+
 Run:
 
 ```bash
@@ -160,7 +162,7 @@ Missing system dependencies for OpenCV.
 
 **Fix:**  
 Ensure you are using the provided Dockerfile. It already installs:
-- `libgl1-mesa-glx`
+- `libgl1`
 - `libsm6`
 
 ---
