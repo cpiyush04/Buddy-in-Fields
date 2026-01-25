@@ -128,10 +128,10 @@ Utilities
 
 ## 🔧 Local Development (Without Docker)
 If you prefer to run it locally for debugging:
-
+**Note:** Use Python 3.11 as interpreter because some packages are not supported by later versions of Python
 Create Virtual Environment:
 ```bash
-python -m venv venv
+py -3.11 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
