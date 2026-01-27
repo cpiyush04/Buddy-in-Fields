@@ -1,4 +1,3 @@
-# Core async / web
 fastapi
 uvicorn
 gunicorn
@@ -22,6 +21,7 @@ langgraph
 langgraph-checkpoint
 langgraph-prebuilt
 langsmith
+langchain-experimental
 
 # Vector DB / embeddings
 faiss-cpu
@@ -84,4 +84,3 @@ ruff
 werkzeug
 gdown
 # sentence-transformers
-langchain_experimental
