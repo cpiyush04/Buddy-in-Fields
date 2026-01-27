@@ -161,11 +161,6 @@ chat_history.db
 uploads/backend/*
 uploads/frontend/*
 uploads/speech/*
-uploads/skin_lesion_output/*
 !uploads/backend/.gitkeep
 !uploads/frontend/.gitkeep
-
-# # Sample images and test data
-sample_images/
-data/
-uploads/
+!uploads/speech/.gitkeep
