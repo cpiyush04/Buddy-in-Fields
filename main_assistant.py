@@ -161,7 +161,7 @@ class QueryRequest(BaseModel):
 
 class SpeechRequest(BaseModel):
     text: str
-    voice_id: str = "EXAMPLE_VOICE_ID"
+    voice_id: str = "21m00Tcm4TlvDq8ikWAM"
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
@@ -372,7 +372,7 @@ async def generate_speech(request: SpeechRequest):
         if not request.text:
             return JSONResponse(status_code=400, content={"error": "Text is required"})
         
-        elevenlabs_url = f"https://api.elevenlabs.io/v1/text-to-speech/{request.voice_id}/stream"
+        elevenlabs_url = f"https://api.elevenlabs.io/v1/text-to-speech/{request.voice_id}"
         headers = {
             "Accept": "audio/mpeg",
             "Content-Type": "application/json",

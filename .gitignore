@@ -95,9 +95,11 @@ celerybeat.pid
 .venv
 env/
 venv/
+venv1/
 ENV/
 env.bak/
 venv.bak/
+venv1.bak/
 .spyderproject
 .spyproject
 .ropeproject
